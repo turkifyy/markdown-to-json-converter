@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="أداة احترافية لإصلاح وتحويل ملفات Markdown إلى JSON مع معالجة متقدمة" />
+  <title>Markdown Fixer & JSON Converter Pro</title>
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --primary-dark: #1e40af;
+      --success: #10b981;
+      --success-dark: #047857;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --bg-dark: #0f172a;
+      --bg-card: #111827;
+      --bg-secondary: #1f2937;
+      --text-primary: #f3f4f6;
+      --text-secondary: #d1d5db;
+      --text-muted: #9ca3af;
+      --border: #374151;
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+      background: linear-gradient(135deg, var(--bg-dark) 0%, #1a2332 100%);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+
+    /* ============== HEADER ============== */
+    .header {
+      text-align: center;
+      margin-bottom: 50px;
+      animation: slideDown 0.6s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .header h1 {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary), #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 15px;
+      letter-spacing: -1px;
+    }
+
+    .header .subtitle {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .header .features {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 20px;
+      font-size: 0.95rem;
+    }
+
+    .feature-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 20px;
+      color: var(--primary);
+    }
+
+    /* ============== CONTROLS PANEL ============== */
+    .control-panel {
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: var(--shadow);
+      animation: fadeIn 0.6s ease-out 0.2s both;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .control-row {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .file-input-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 24px;
+      background: linear-gradient(135deg, var(--bg-secondary), var(--bg-dark));
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: var(--text-primary);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .file-input-label:hover {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+      transform: translateY(-2px);
+    }
+
+    input[type="file"]:focus + .file-input-label {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+    }
+
+    /* ============== BUTTONS ============== */
+    .btn {
+      padding: 12px 28px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 35px rgba(59, 130, 246, 0.4);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--success), var(--success-dark));
+      color: white;
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-success:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--border);
+      transform: translateY(-2px);
+    }
+
+    .btn-small {
+      padding: 8px 16px;
+      font-size: 0.9rem;
+    }
+
+    /* ============== STATUS BAR ============== */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 15px 20px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 12px;
+      margin-top: 20px;
+      color: var(--success);
+      animation: slideUp 0.4s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .status-bar.error {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: var(--danger);
+    }
+
+    .status-bar.warning {
+      background: rgba(245, 158, 11, 0.1);
+      border-color: rgba(245, 158, 11, 0.3);
+      color: var(--warning);
+    }
+
+    .status-bar.info {
+      background: rgba(59, 130, 246, 0.1);
+      border-color: rgba(59, 130, 246, 0.3);
+      color: var(--primary);
+    }
+
+    .status-icon {
+      font-size: 1.2rem;
+      min-width: 20px;
+    }
+
+    .status-message {
+      flex: 1;
+      font-size: 0.95rem;
+    }
+
+    .status-time {
+      font-size: 0.85rem;
+      color: inherit;
+      opacity: 0.7;
+    }
+
+    /* ============== GRID LAYOUT ============== */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 30px;
+      animation: fadeIn 0.6s ease-out 0.4s both;
+    }
+
+    @media (max-width: 1200px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ============== EDITOR PANELS ============== */
+    .editor-panel {
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-header {
+      background: linear-gradient(135deg, var(--bg-secondary), var(--bg-dark));
+      padding: 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .panel-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .panel-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .panel-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .panel-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      min-height: 400px;
+    }
+
+    .editor {
+      flex: 1;
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.5), rgba(20, 30, 50, 0.5));
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-family: 'Fira Code', 'Courier New', monospace;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      resize: vertical;
+      transition: all 0.3s ease;
+    }
+
+    .editor:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .editor::placeholder {
+      color: var(--text-muted);
+    }
+
+    /* ============== STATS SECTION ============== */
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid var(--border);
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 5px;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* ============== MODAL ============== */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 30px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: var(--shadow);
+      animation: slideDown 0.3s ease-out;
+    }
+
+    .modal-header {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: var(--text-primary);
+    }
+
+    .modal-body {
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    /* ============== FOOTER ============== */
+    .footer {
+      text-align: center;
+      padding-top: 40px;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .footer p {
+      margin-bottom: 10px;
+    }
+
+    /* ============== LOADER ============== */
+    .loader {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(59, 130, 246, 0.3);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ============== COPY BUTTON ============== */
+    .copy-btn {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      color: var(--primary);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(59, 130, 246, 0.3);
+      border-color: var(--primary);
+    }
+
+    .copy-btn.copied {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: rgba(16, 185, 129, 0.4);
+      color: var(--success);
+    }
+
+    /* ============== RESPONSIVE ============== */
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .control-row {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .control-row > * {
+        width: 100%;
+      }
+
+      .content-grid {
+        gap: 20px;
+      }
+
+      .panel-content {
+        min-height: 300px;
+      }
+    }
+
+    /* ============== SCROLLBAR ============== */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-dark);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- HEADER -->
+    <div class="header">
+      <h1>✨ Markdown Fixer & JSON Converter Pro</h1>
+      <p class="subtitle">أداة احترافية لإصلاح وتنظيم وتحويل ملفات Markdown إلى JSON بشكل ذكي ومتقدم</p>
+      <div class="features">
+        <div class="feature-tag">🔧 إصلاح تلقائي</div>
+        <div class="feature-tag">📊 تحويل ذكي</div>
+        <div class="feature-tag">⚡ معالجة فورية</div>
+        <div class="feature-tag">💾 تنزيل آمن</div>
+      </div>
+    </div>
+
+    <!-- CONTROL PANEL -->
+    <div class="control-panel">
+      <div class="control-row">
+        <div class="file-input-wrapper">
+          <input type="file" id="fileInput" accept=".md,.markdown,.txt" />
+          <label for="fileInput" class="file-input-label">📁 اختر ملف Markdown</label>
+        </div>
+        <button class="btn btn-primary" id="processBtn">
+          <span>⚙️ معالجة الملف</span>
+        </button>
+        <button class="btn btn-success" id="downloadBtn" disabled>
+          <span>💾 تحميل JSON</span>
+        </button>
+        <button class="btn btn-secondary btn-small" id="copyJsonBtn" disabled>
+          📋 نسخ
+        </button>
+        <button class="btn btn-secondary btn-small" id="clearBtn">
+          🗑️ مسح
+        </button>
+      </div>
+      <div id="statusContainer"></div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="content-grid">
+      <!-- MARKDOWN INPUT -->
+      <div class="editor-panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            📝 محتوى Markdown الأصلي
+            <span class="panel-badge">INPUT</span>
+          </div>
+          <div class="panel-actions">
+            <button class="btn btn-secondary btn-small" id="pasteBtn">📋 لصق</button>
+          </div>
+        </div>
+        <div class="panel-content">
+          <textarea 
+            id="markdownInput" 
+            class="editor"
+            placeholder="أدخل نص Markdown هنا أو قم بتحميل ملف...&#10;&#10;📌 أمثلة:&#10;# عنوان&#10;## عنوان فرعي&#10;- عنصر قائمة&#10;1. عنصر مرقم&#10;> اقتباس&#10;`كود`&#10;[رابط](https://example.com)"
+          ></textarea>
+          <div class="stats-container">
+            <div class="stat-item">
+              <div class="stat-label">الأسطر</div>
+              <div class="stat-value" id="lineCount">0</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">الكلمات</div>
+              <div class="stat-value" id="wordCount">0</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">الأحرف</div>
+              <div class="stat-value" id="charCount">0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- JSON OUTPUT -->
+      <div class="editor-panel">
+        <div class="panel-header">
+          <div class="panel-title">
+            🎯 ملف JSON الناتج
+            <span class="panel-badge">OUTPUT</span>
+          </div>
+          <div class="panel-actions">
+            <button class="btn btn-secondary btn-small" id="validateBtn" disabled>✓ تحقق</button>
+          </div>
+        </div>
+        <div class="panel-content">
+          <textarea 
+            id="jsonOutput" 
+            class="editor"
+            readonly
+            placeholder="سيظهر ملف JSON المعالج هنا مع جميع البيانات المنظمة بشكل احترافي..."
+          ></textarea>
+          <div class="stats-container">
+            <div class="stat-item">
+              <div class="stat-label">الحجم</div>
+              <div class="stat-value" id="jsonSize">0 B</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">الكائنات</div>
+              <div class="stat-value" id="objectCount">0</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-label">الحالة</div>
+              <div class="stat-value" id="validityStatus">-</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <p>© 2024 Markdown to JSON Converter Pro - جميع الحقوق محفوظة</p>
+      <p>صُمّمت بعناية لتقديم أفضل تجربة معالجة وتحويل ملفات Markdown</p>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <div class="modal-header" id="modalTitle">رسالة</div>
+      <div class="modal-body" id="modalMessage"></div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="modalOkBtn">حسناً</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ======================= VARIABLES =======================
+    const fileInput = document.getElementById('fileInput');
+    const markdownInput = document.getElementById('markdownInput');
+    const jsonOutput = document.getElementById('jsonOutput');
+    const processBtn = document.getElementById('processBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const copyJsonBtn = document.getElementById('copyJsonBtn');
+    const pasteBtn = document.getElementById('pasteBtn');
+    const validateBtn = document.getElementById('validateBtn');
+    const statusContainer = document.getElementById('statusContainer');
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalMessage = document.getElementById('modalMessage');
+    const modalOkBtn = document.getElementById('modalOkBtn');
+
+    // Stats elements
+    const lineCountEl = document.getElementById('lineCount');
+    const wordCountEl = document.getElementById('wordCount');
+    const charCountEl = document.getElementById('charCount');
+    const jsonSizeEl = document.getElementById('jsonSize');
+    const objectCountEl = document.getElementById('objectCount');
+    const validityStatusEl = document.getElementById('validityStatus');
+
+    let exportedJson = null;
+
+    // ======================= UTILITY FUNCTIONS =======================
+    function showStatus(message, type = 'success', duration = 5000) {
+      const statusEl = document.createElement('div');
+      statusEl.className = `status-bar ${type}`;
+      
+      const icons = {
+        success: '✅',
+        error: '❌',
+        warning: '⚠️',
+        info: 'ℹ️'
+      };
+
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('ar-SA');
+
+      statusEl.innerHTML = `
+        <div class="status-icon">${icons[type]}</div>
+        <div class="status-message">${message}</div>
+        <div class="status-time">${timeStr}</div>
+      `;
+
+      statusContainer.innerHTML = '';
+      statusContainer.appendChild(statusEl);
+
+      if (duration) {
+        setTimeout(() => statusEl.remove(), duration);
+      }
+    }
+
+    function showModal(title, message) {
+      modalTitle.textContent = title;
+      modalMessage.textContent = message;
+      modal.classList.add('active');
+    }
+
+    function closeModal() {
+      modal.classList.remove('active');
+    }
+
+    function updateStats() {
+      const text = markdownInput.value;
+      const lines = text.split('\n').filter(line => line.trim()).length;
+      const words = text.split(/\s+/).filter(w => w).length;
+      const chars = text.length;
+
+      lineCountEl.textContent = lines;
+      wordCountEl.textContent = words;
+      charCountEl.textContent = chars;
+    }
+
+    function updateJsonStats() {
+      if (!exportedJson) return;
+
+      const jsonStr = JSON.stringify(exportedJson, null, 2);
+      const bytes = new TextEncoder().encode(jsonStr).length;
+      const sizeKB = (bytes / 1024).toFixed(2);
+
+      jsonSizeEl.textContent = sizeKB > 1 ? `${sizeKB} KB` : `${bytes} B`;
+      objectCountEl.textContent = JSON.stringify(exportedJson).split('{').length - 1;
+      validityStatusEl.textContent = '✓ صحيح';
+      validityStatusEl.style.color = '#10b981';
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+    }
+
+    // ======================= MARKDOWN FIXING =======================
+    function fixMarkdown(text) {
+      // تصحيح مشاكل الترميز
+      let output = text.replace(/\r\n/g, '\n');
+      output = output.replace(/\r/g, '\n');
+      output = output.replace(/\t/g, '    ');
+
+      // إزالة المسافات الزائدة
+      output = output.replace(/[ \u00A0]+$/gm, '');
+      output = output.replace(/^\s+/gm, (match) => {
+        const spaces = match.length;
+        if (spaces % 4 === 0) return ' '.repeat(spaces);
+        return ' '.repeat(Math.round(spaces / 4) * 4);
+      });
+
+      // إزالة الأسطر الفارغة الزائدة
+      output = output.replace(/\n{3,}/g, '\n\n');
+      output = output.trim();
+
+      // معالجة الأحرف غير المرئية
+      output = output.replace(/[\u200B-\u200D\uFEFF]/g, '');
+
+      const lines = output.split('\n');
+      const fixed = [];
+      let inCodeBlock = false;
+      let codeBlockType = '';
+
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+
+        // التعرف على كتل الأكواد
+        if (/^```/.test(line.trim())) {
+          inCodeBlock = !inCodeBlock;
+          codeBlockType = inCodeBlock ? line.trim() : '';
+          fixed.push(line);
+          continue;
+        }
+
+        if (inCodeBlock) {
+          fixed.push(line);
+          continue;
+        }
+
+        // تصحيح العناوين
+        if (/^#{1,6}\s+/.test(line)) {
+          line = line.replace(/^(#{1,6})\s*/, '$1 ');
+          fixed.push(line.trim());
+          continue;
+        }
+
+        // تصحيح القوائم
+        if (/^[-*+]\s+/.test(line)) {
+          line = line.replace(/^[-*+]\s+/, '- ');
+          fixed.push(line);
+          continue;
+        }
+
+        // تصحيح القوائم المرقمة
+        if (/^\d+\.\s+/.test(line)) {
+          const match = line.match(/^(\d+)\.\s+/);
+          const number = parseInt(match[1]);
+          line = line.replace(/^\d+\.\s+/, `${number}. `);
+          fixed.push(line);
+          continue;
+        }
+
+        // تصحيح الاقتباسات
+        if (/^>\s?/.test(line)) {
+          line = line.replace(/^>\s?/, '> ');
+          fixed.push(line.trim());
+          continue;
+        }
+
+        // تصحيح الجداول
+        if (/\|/.test(line)) {
+          line = line.replace(/\s*\|\s*/g, ' | ');
+          fixed.push(line);
+          continue;
+        }
+
+        if (line.trim()) {
+          fixed.push(line);
+        } else if (fixed.length && fixed[fixed.length - 1] !== '') {
+          fixed.push('');
+        }
+      }
+
+      let result = fixed.join('\n');
+      result = result.replace(/\n{3,}/g, '\n\n');
+      result = result.replace(/\n\s*$/g, '');
+
+      return result;
+    }
+
+    // ======================= MARKDOWN TO JSON =======================
+    function markdownToJson(markdown) {
+      const lines = markdown.split('\n');
+      const blocks = [];
+      let i = 0;
+
+      while (i < lines.length) {
+        const line = lines[i];
+
+        // تخطي الأسطر الفارغة
+        if (!line.trim()) {
+          i++;
+          continue;
+        }
+
+        // معالجة العناوين
+        if (/^#{1,6}\s+/.test(line)) {
+          const level = line.match(/^#+/)[0].length;
+          const text = line.replace(/^#+\s+/, '').trim();
+          blocks.push({
+            type: 'heading',
+            level,
+            text,
+            id: generateId(text)
+          });
+          i++;
+          continue;
+        }
+
+        // معالجة كتل الأكواد
+        if (/^```/.test(line.trim())) {
+          const language = line.replace(/^```/, '').trim() || 'plaintext';
+          const code = [];
+          i++;
+          while (i < lines.length && !/^```/.test(lines[i].trim())) {
+            code.push(lines[i]);
+            i++;
+          }
+          blocks.push({
+            type: 'code',
+            language,
+            code: code.join('\n').trim(),
+            lineCount: code.length
+          });
+          i++;
+          continue;
+        }
+
+        // معالجة الجداول
+        if (/\|.*\|/.test(line) && i + 1 < lines.length && /\|[\s:-]+\|/.test(lines[i + 1])) {
+          const table = parseTable(lines, i);
+          blocks.push(table);
+          i += table.rowCount;
+          continue;
+        }
+
+        // معالجة القوائم
+        if (/^[-*+]\s+/.test(line)) {
+          const listItems = [];
+          while (i < lines.length && /^[-*+]\s+/.test(lines[i])) {
+            const item = lines[i].replace(/^[-*+]\s+/, '').trim();
+            listItems.push({ text: item });
+            i++;
+          }
+          blocks.push({
+            type: 'list',
+            ordered: false,
+            items: listItems,
+            count: listItems.length
+          });
+          continue;
+        }
+
+        // معالجة القوائم المرقمة
+        if (/^\d+\.\s+/.test(line)) {
+          const listItems = [];
+          while (i < lines.length && /^\d+\.\s+/.test(lines[i])) {
+            const item = lines[i].replace(/^\d+\.\s+/, '').trim();
+            listItems.push({ text: item });
+            i++;
+          }
+          blocks.push({
+            type: 'list',
+            ordered: true,
+            items: listItems,
+            count: listItems.length
+          });
+          continue;
+        }
+
+        // معالجة الاقتباسات
+        if (/^>\s/.test(line)) {
+          const quotes = [];
+          while (i < lines.length && /^>\s?/.test(lines[i])) {
+            const text = lines[i].replace(/^>\s?/, '').trim();
+            if (text) quotes.push(text);
+            i++;
+          }
+          blocks.push({
+            type: 'blockquote',
+            content: quotes.join(' '),
+            lines: quotes.length
+          });
+          continue;
+        }
+
+        // معالجة الفقرات
+        const paragraph = [];
+        while (i < lines.length && lines[i].trim() && 
+               !/^#{1,6}\s+/.test(lines[i]) &&
+               !/^```/.test(lines[i]) &&
+               !/^[-*+]\s+/.test(lines[i]) &&
+               !/^\d+\.\s+/.test(lines[i]) &&
+               !/^>\s/.test(lines[i]) &&
+               !/\|.*\|/.test(lines[i])) {
+          paragraph.push(lines[i]);
+          i++;
+        }
+
+        if (paragraph.length) {
+          blocks.push({
+            type: 'paragraph',
+            text: paragraph.join(' ').trim(),
+            wordCount: paragraph.join(' ').split(/\s+/).length
+          });
+        }
+      }
+
+      // استخراج البيانات الوصفية
+      const title = extractTitle(blocks);
+      const summary = extractSummary(blocks);
+      const metadata = generateMetadata(blocks, markdown);
+
+      return {
+        document: {
+          title,
+          summary,
+          language: 'ar',
+          direction: 'rtl',
+          version: '1.0'
+        },
+        metadata: {
+          createdAt: new Date().toISOString(),
+          processedAt: new Date().toISOString(),
+          totalBlocks: blocks.length,
+          totalWords: countWords(markdown),
+          totalCharacters: markdown.length,
+          readingTimeMinutes: Math.ceil(countWords(markdown) / 200),
+          encoding: 'UTF-8'
+        },
+        structure: {
+          headings: blocks.filter(b => b.type === 'heading').length,
+          paragraphs: blocks.filter(b => b.type === 'paragraph').length,
+          lists: blocks.filter(b => b.type === 'list').length,
+          codeBlocks: blocks.filter(b => b.type === 'code').length,
+          tables: blocks.filter(b => b.type === 'table').length,
+          quotes: blocks.filter(b => b.type === 'blockquote').length
+        },
+        tableOfContents: generateTableOfContents(blocks),
+        content: blocks
+      };
+    }
+
+    function parseTable(lines, startIndex) {
+      const headerLine = lines[startIndex];
+      const separatorLine = lines[startIndex + 1];
+
+      const headers = headerLine
+        .split('|')
+        .slice(1, -1)
+        .map(h => h.trim());
+
+      const alignment = separatorLine
+        .split('|')
+        .slice(1, -1)
+        .map(a => {
+          if (a.includes(':')) {
+            if (a.trim().startsWith(':') && a.trim().endsWith(':')) return 'center';
+            if (a.trim().startsWith(':')) return 'left';
+            if (a.trim().endsWith(':')) return 'right';
+          }
+          return 'left';
+        });
+
+      const rows = [];
+      let i = startIndex + 2;
+      while (i < lines.length && /\|.*\|/.test(lines[i])) {
+        const cells = lines[i]
+          .split('|')
+          .slice(1, -1)
+          .map(c => c.trim());
+        
+        const row = {};
+        headers.forEach((header, idx) => {
+          row[header] = cells[idx] || '';
+        });
+        rows.push(row);
+        i++;
+      }
+
+      return {
+        type: 'table',
+        headers,
+        alignment,
+        rows,
+        rowCount: rows.length + 2,
+        columnCount: headers.length
+      };
+    }
+
+    function extractTitle(blocks) {
+      const heading = blocks.find(b => b.type === 'heading' && b.level === 1);
+      if (heading) return heading.text;
+
+      const firstHeading = blocks.find(b => b.type === 'heading');
+      if (firstHeading) return firstHeading.text;
+
+      const firstParagraph = blocks.find(b => b.type === 'paragraph');
+      if (firstParagraph) return firstParagraph.text.substring(0, 80);
+
+      return 'بدون عنوان';
+    }
+
+    function extractSummary(blocks) {
+      const textBlocks = blocks
+        .filter(b => ['paragraph', 'heading', 'blockquote'].includes(b.type))
+        .map(b => b.text || '')
+        .join(' ')
+        .trim();
+
+      if (textBlocks) {
+        return textBlocks.substring(0, 300) + (textBlocks.length > 300 ? '...' : '');
+      }
+      return 'ملف بدون وصف';
+    }
+
+    function generateMetadata(blocks, markdown) {
+      return {
+        totalLines: markdown.split('\n').length,
+        totalParagraphs: blocks.filter(b => b.type === 'paragraph').length,
+        totalHeadings: blocks.filter(b => b.type === 'heading').length,
+        maxHeadingLevel: Math.max(...blocks.filter(b => b.type === 'heading').map(b => b.level || 0), 0),
+        listCount: blocks.filter(b => b.type === 'list').length,
+        codeBlockCount: blocks.filter(b => b.type === 'code').length,
+        codeLanguages: [...new Set(blocks.filter(b => b.type === 'code').map(b => b.language))],
+        hasTable: blocks.some(b => b.type === 'table'),
+        hasQuotes: blocks.some(b => b.type === 'blockquote')
+      };
+    }
+
+    function generateTableOfContents(blocks) {
+      return blocks
+        .filter(b => b.type === 'heading')
+        .map(b => ({
+          level: b.level,
+          title: b.text,
+          id: b.id
+        }));
+    }
+
+    function generateId(text) {
+      return text
+        .toLowerCase()
+        .replace(/[^\u0600-\u06FF\w\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+    }
+
+    function countWords(text) {
+      return text.split(/\s+/).filter(w => w.length > 0).length;
+    }
+
+    // ======================= EVENT LISTENERS =======================
+    fileInput.addEventListener('change', async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      showStatus(`جارٍ تحميل الملف: ${file.name}...`, 'info');
+
+      try {
+        const text = await file.text();
+        markdownInput.value = text;
+        updateStats();
+        showStatus(`✓ تم تحميل الملف بنجاح (${formatFileSize(file.size)})`, 'success');
+      } catch (error) {
+        showStatus(`❌ خطأ في قراءة الملف: ${error.message}`, 'error');
+      }
+    });
+
+    processBtn.addEventListener('click', () => {
+      const raw = markdownInput.value.trim();
+      
+      if (!raw) {
+        showStatus('يرجى إدخال نص Markdown أولاً', 'warning');
+        return;
+      }
+
+      try {
+        processBtn.innerHTML = '<span class="loader"></span> جارٍ المعالجة...';
+        processBtn.disabled = true;
+
+        setTimeout(() => {
+          const fixed = fixMarkdown(raw);
+          const json = markdownToJson(fixed);
+          exportedJson = json;
+
+          jsonOutput.value = JSON.stringify(json, null, 2);
+          updateStats();
+          updateJsonStats();
+
+          downloadBtn.disabled = false;
+          copyJsonBtn.disabled = false;
+          validateBtn.disabled = false;
+
+          processBtn.innerHTML = '<span>⚙️ معالجة الملف</span>';
+          processBtn.disabled = false;
+
+          showStatus('✓ تمت المعالجة بنجاح! ملف JSON جاهز للتنزيل', 'success');
+        }, 300);
+      } catch (error) {
+        processBtn.innerHTML = '<span>⚙️ معالجة الملف</span>';
+        processBtn.disabled = false;
+        showStatus(`❌ خطأ: ${error.message}`, 'error');
+      }
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      if (!exportedJson) {
+        showStatus('لا يوجد ملف JSON للتنزيل', 'warning');
+        return;
+      }
+
+      try {
+        const data = JSON.stringify(exportedJson, null, 2);
+        const blob = new Blob([data], { type: 'application/json; charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.href = url;
+        const title = exportedJson.document.title.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, '_');
+        link.download = `${title}_${Date.now()}.json`;
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        showStatus('✓ تم تنزيل ملف JSON بنجاح', 'success');
+      } catch (error) {
+        showStatus(`❌ خطأ في التنزيل: ${error.message}`, 'error');
+      }
+    });
+
+    copyJsonBtn.addEventListener('click', () => {
+      if (!exportedJson) return;
+
+      const data = JSON.stringify(exportedJson, null, 2);
+      navigator.clipboard.writeText(data).then(() => {
+        copyJsonBtn.textContent = '✓ تم النسخ';
+        showStatus('✓ تم نسخ JSON إلى الحافظة', 'success', 3000);
+        setTimeout(() => {
+          copyJsonBtn.textContent = '📋 نسخ';
+        }, 2000);
+      }).catch(() => {
+        showStatus('❌ فشل نسخ النص', 'error');
+      });
+    });
+
+    clearBtn.addEventListener('click', () => {
+      markdownInput.value = '';
+      jsonOutput.value = '';
+      exportedJson = null;
+      downloadBtn.disabled = true;
+      copyJsonBtn.disabled = true;
+      validateBtn.disabled = true;
+      statusContainer.innerHTML = '';
+      updateStats();
+      showStatus('✓ تم مسح جميع البيانات', 'info', 3000);
+    });
+
+    pasteBtn.addEventListener('click', async () => {
+      try {
+        const text = await navigator.clipboard.readText();
+        markdownInput.value = text;
+        updateStats();
+        showStatus('✓ تم لصق النص بنجاح', 'success', 3000);
+      } catch (error) {
+        showStatus('❌ فشل اللصق. تأكد من الأذونات', 'error');
+      }
+    });
+
+    validateBtn.addEventListener('click', () => {
+      try {
+        JSON.parse(jsonOutput.value);
+        showModal('✓ صحيح', 'ملف JSON صحيح تماماً وخالي من الأخطاء');
+      } catch (error) {
+        showModal('❌ خطأ في JSON', `الخطأ: ${error.message}`);
+      }
+    });
+
+    markdownInput.addEventListener('input', updateStats);
+
+    modalOkBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    // التهيئة الأولية
+    updateStats();
+  </script>
+</body>
+</html>
